@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16.2
+    container_name: flat-bot-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flat_bot
+    ports:
+      - "5433:5432"
+    volumes:
+      - flat-bot-postgres-data:/var/lib/postgresql/data
+volumes:
+  flat-bot-postgres-data:
