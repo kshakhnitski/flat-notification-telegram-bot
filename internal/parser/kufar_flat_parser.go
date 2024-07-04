@@ -32,8 +32,8 @@ func (p KufarFlatParser) Parse() ([]model.Flat, error) {
 
 	var flats []model.Flat
 	doc.Find("section").Each(func(index int, item *goquery.Selection) {
-		link := ExtractLink(item)
-		id, err := ExtractIDFromLink(link)
+		link := extractLink(item)
+		id, err := extractIDFromLink(link)
 		if err != nil {
 			return
 		}
@@ -55,7 +55,7 @@ func (p KufarFlatParser) Parse() ([]model.Flat, error) {
 	return flats, nil
 }
 
-func ExtractLink(item *goquery.Selection) string {
+func extractLink(item *goquery.Selection) string {
 	link, _ := item.Find(".styles_wrapper__Q06m9").Attr("href")
 	return link
 
@@ -95,7 +95,7 @@ func extractDescription(item *goquery.Selection) string {
 	return item.Find(".styles_body__5BrnC, .styles_body__r33c8").Text()
 }
 
-func ExtractIDFromLink(link string) (string, error) {
+func extractIDFromLink(link string) (string, error) {
 	parsedURL, err := url.Parse(link)
 	if err != nil {
 		return "", err

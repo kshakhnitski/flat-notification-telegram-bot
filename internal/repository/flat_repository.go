@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"flat_bot/internal/model"
 	"gorm.io/gorm"
 )
@@ -48,12 +47,10 @@ func (r FlatRepositoryImpl) Create(flat model.Flat) (model.Flat, error) {
 }
 
 func (r FlatRepositoryImpl) ExistsByID(id string) (bool, error) {
-	var flat model.Flat
-	if err := r.db.Select("id").Where("id = ?", id).First(&flat).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
+	var count int64
+	err := r.db.Model(&model.Flat{}).Where("id = ?", id).Count(&count).Error
+	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return count > 0, nil
 }
