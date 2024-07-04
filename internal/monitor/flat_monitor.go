@@ -1,4 +1,4 @@
-package listener
+package monitor
 
 import (
 	"flat_bot/internal/model"
@@ -10,26 +10,26 @@ import (
 
 type FlatsHandler func(flats []model.Flat)
 
-type FlatListener struct {
+type FlatMonitor struct {
 	sources          []string
 	checkInterval    time.Duration
 	newFlatsConsumer FlatsHandler
 	flatRepository   repository.FlatRepository
 }
 
-func NewFlatListener(
+func NewFlatMonitor(
 	checkInterval time.Duration,
 	flatRepository repository.FlatRepository,
 	newFlatsConsumer FlatsHandler,
-) FlatListener {
-	return FlatListener{
+) FlatMonitor {
+	return FlatMonitor{
 		checkInterval:    checkInterval,
 		flatRepository:   flatRepository,
 		newFlatsConsumer: newFlatsConsumer,
 	}
 }
 
-func (l FlatListener) Start() {
+func (l FlatMonitor) Start() {
 	ticker := time.NewTicker(l.checkInterval)
 	defer ticker.Stop()
 
@@ -37,15 +37,11 @@ func (l FlatListener) Start() {
 		log.Println("Checking for new flats...")
 		newFlats := l.checkForNewFlats()
 
-		if len(newFlats) == 0 {
-			continue
-		}
-
 		l.newFlatsConsumer(newFlats)
 	}
 }
 
-func (l FlatListener) checkForNewFlats() []model.Flat {
+func (l FlatMonitor) checkForNewFlats() []model.Flat {
 	var loadedFlats []model.Flat
 	var newFlats []model.Flat
 
