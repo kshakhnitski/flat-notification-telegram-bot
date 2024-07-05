@@ -1,15 +1,32 @@
-commands
+# Setup Instructions
 
-```bash
-go get github.com/joho/godotenv
-go get github.com/PuerkitoBio/goquery
-go get -u gorm.io/gorm
-go get -u gorm.io/driver/postgres
-go get -u gopkg.in/telebot.v3
-```
+1. Clone the repository
+   Clone the repository using Git:
+   ```bash
+   git clone https://github.com/kshakhnitski/flat-notification-telegram-bot.git
+   cd flat-notification-telegram-bot
+   ```
 
-TODO:
+2. Set up PostgreSQL Database using Docker-Compose
+   Make sure you have Docker installed. Then, use Docker-Compose to spin up a PostgreSQL database:
+   ```bash
+    docker-compose up -d
+   ```
 
-1. Добавить предпочтительные параметры квартиры (количество комнат, стоимость и тд)
-2. Добавить поддержку нескольких языков (русский, английский)
-3. Улучшить стилизацию сообщений
+3. Configure environment variables
+   Create a `.env` file in the root directory of the project and add your environment variables:
+    ```dotenv
+    DB_PORT=5432
+    DB_HOST=localhost
+    DB_USER=postgres
+    DB_PASSWORD=password
+    DB_NAME=flat_bot
+    TELEGRAM_BOT_API_KEY=your_telegram_bot_api_key
+    ```
+
+4. Run the project
+   Finally, start the project by running the following command:
+   ```bash
+   go run cmd/app/main.go
+   ```
+   This command will run the Go application, connecting it to the PostgreSQL database and starting your Telegram bot.
