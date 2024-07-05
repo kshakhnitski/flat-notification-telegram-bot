@@ -36,7 +36,6 @@ func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.
 func initializeHandlers(bot *telebot.Bot, userRepository repository.UserRepository) {
 	startHandler := handler.NewStartHandler(userRepository)
 	bot.Handle(startHandler.Endpoint, startHandler.Handle)
-
 }
 
 func (b *TelegramBot) Start() {
@@ -48,6 +47,10 @@ func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
 	if err != nil {
 		log.Printf("Error while reading message template: %v", err)
 		return
+	}
+
+	if flat.Metro == "" {
+		flat.Metro = "Не указано"
 	}
 
 	message := fmt.Sprintf(

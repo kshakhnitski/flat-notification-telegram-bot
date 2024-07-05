@@ -38,9 +38,14 @@ func (p KufarFlatParser) Parse() ([]model.Flat, error) {
 			return
 		}
 
+		params := extractParameters(item)
 		flat := model.Flat{
 			ID:          id,
-			Parameters:  extractParameters(item),
+			Parameters:  params.Summary,
+			Rooms:       params.Rooms,
+			Area:        params.Area,
+			Floor:       params.Floor,
+			TotalFloors: params.TotalFloors,
 			Address:     extractAddress(item),
 			Description: extractDescription(item),
 			Metro:       extractMetro(item),
@@ -61,12 +66,51 @@ func extractLink(item *goquery.Selection) string {
 
 }
 
+type ApartmentParameters struct {
+	Summary     string
+	Rooms       int
+	Area        *float64
+	Floor       *int
+	TotalFloors *int
+}
+
 func extractMetro(item *goquery.Selection) string {
 	return item.Find(".styles_wrapper__HKXX4 span").Text()
 }
 
-func extractParameters(item *goquery.Selection) string {
-	return item.Find(".styles_parameters__7zKlL").Text()
+func extractParameters(item *goquery.Selection) ApartmentParameters {
+	parametersStr := item.Find(".styles_parameters__7zKlL").Text()
+
+	parsedParams := ApartmentParameters{
+		Summary:     parametersStr,
+		Rooms:       0,
+		Area:        nil,
+		Floor:       nil,
+		TotalFloors: nil,
+	}
+
+	roomsRegex := regexp.MustCompile(`(\d+)\s*комн\.`)
+	if roomsMatch := roomsRegex.FindStringSubmatch(parametersStr); roomsMatch != nil {
+		parsedParams.Rooms, _ = strconv.Atoi(roomsMatch[1])
+	}
+
+	areaRegex := regexp.MustCompile(`(\d+(\.\d+)?)\s*м²`)
+	if areaMatch := areaRegex.FindStringSubmatch(parametersStr); areaMatch != nil {
+		area, _ := strconv.ParseFloat(areaMatch[1], 64)
+		parsedParams.Area = &area
+	}
+
+	floorRegex := regexp.MustCompile(`этаж\s*(\d+)(?:\s*из\s*(\d+))?`)
+	if floorMatch := floorRegex.FindStringSubmatch(parametersStr); floorMatch != nil {
+		floor, _ := strconv.Atoi(floorMatch[1])
+		parsedParams.Floor = &floor
+		if len(floorMatch) > 2 && floorMatch[2] != "" {
+			totalFloors, _ := strconv.Atoi(floorMatch[2])
+			parsedParams.TotalFloors = &totalFloors
+		}
+	}
+
+	return parsedParams
 }
 
 func extractAddress(item *goquery.Selection) string {
