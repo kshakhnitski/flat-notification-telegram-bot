@@ -11,7 +11,7 @@ type Flat struct {
 	AreaInSqM   *float64 `gorm:"type:numeric(10,2);null"`
 	Floor       *int     `gorm:"type:integer;null"`
 	TotalFloors *int     `gorm:"type:integer;null"`
-	Metro       string   `gorm:"type:varchar(255)"`
+	Metro       *string  `gorm:"type:varchar(255);null"`
 	Link        string   `gorm:"type:varchar(255)"`
 	Source      string   `gorm:"type:varchar(255)"`
 }

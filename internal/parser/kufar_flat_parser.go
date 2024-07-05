@@ -74,8 +74,12 @@ type ApartmentParameters struct {
 	TotalFloors *int
 }
 
-func extractMetro(item *goquery.Selection) string {
-	return item.Find(".styles_wrapper__HKXX4 span").Text()
+func extractMetro(item *goquery.Selection) *string {
+	text := item.Find(".styles_wrapper__HKXX4 span").Text()
+	if text == "" {
+		return nil
+	}
+	return &text
 }
 
 func extractParameters(item *goquery.Selection) ApartmentParameters {

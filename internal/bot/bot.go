@@ -56,8 +56,9 @@ func (b *TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
 	}
 
 	for _, flat := range flats {
-		if flat.Metro == "" {
-			flat.Metro = "Не указано"
+		if flat.Metro == nil {
+			flat.Metro = new(string)
+			*flat.Metro = "Не указано"
 		}
 
 		message := fmt.Sprintf(
@@ -67,7 +68,7 @@ func (b *TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
 			flat.Parameters,
 			flat.Address,
 			flat.Description,
-			flat.Metro,
+			*flat.Metro,
 			flat.Link,
 			flat.PriceInUsd,
 			flat.PriceInByn,
