@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"flat_bot/internal/model"
 	"flat_bot/internal/repository"
 	"fmt"
 	"gopkg.in/telebot.v3"
 	"log"
+	"os"
 )
 
 type StartHandler struct {
@@ -43,7 +45,10 @@ func (h *StartHandler) Handle(c telebot.Context) error {
 		}
 	}
 
-	return c.Send(fmt.Sprintf(
-		"Hello, <b>%s</b>! I'm a bot that will send you notifications about new flats.", user.FirstName),
-		telebot.ModeHTML)
+	messagePattern, err := os.ReadFile("templates/hello.html")
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error while reading hello message template: %v", err))
+	}
+
+	return c.Send(fmt.Sprintf(string(messagePattern), user.FirstName), telebot.ModeHTML)
 }

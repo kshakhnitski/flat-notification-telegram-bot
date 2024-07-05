@@ -43,7 +43,7 @@ func (b *TelegramBot) Start() {
 }
 
 func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
-	messagePattern, err := readHTMLMessageFromFile("templates/new_flat_pattern.html")
+	messagePattern, err := os.ReadFile("templates/new_flat_pattern.html")
 	if err != nil {
 		log.Printf("Error while reading message template: %v", err)
 		return
@@ -54,7 +54,7 @@ func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
 	}
 
 	message := fmt.Sprintf(
-		messagePattern,
+		string(messagePattern),
 		flat.ID,
 		flat.Source,
 		flat.Parameters,
@@ -79,12 +79,4 @@ func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
 		}
 	}
 
-}
-
-func readHTMLMessageFromFile(filePath string) (string, error) {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
 }
