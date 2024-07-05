@@ -8,7 +8,7 @@ type Flat struct {
 	PriceInUsd  float64  `gorm:"type:numeric(10,2)"`
 	Parameters  string   `gorm:"type:varchar(255)"`
 	Rooms       int      `gorm:"type:integer"`
-	Area        *float64 `gorm:"type:numeric(10,2);null"`
+	AreaInSqM   *float64 `gorm:"type:numeric(10,2);null"`
 	Floor       *int     `gorm:"type:integer;null"`
 	TotalFloors *int     `gorm:"type:integer;null"`
 	Metro       string   `gorm:"type:varchar(255)"`

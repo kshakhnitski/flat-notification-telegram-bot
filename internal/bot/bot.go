@@ -42,29 +42,12 @@ func (b *TelegramBot) Start() {
 	b.bot.Start()
 }
 
-func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
-	messagePattern, err := os.ReadFile("templates/new_flat_pattern.html")
+func (b *TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
+	messagePattern, err := os.ReadFile("templates/new_flat_available.html")
 	if err != nil {
 		log.Printf("Error while reading message template: %v", err)
 		return
 	}
-
-	if flat.Metro == "" {
-		flat.Metro = "Не указано"
-	}
-
-	message := fmt.Sprintf(
-		string(messagePattern),
-		flat.ID,
-		flat.Source,
-		flat.Parameters,
-		flat.Address,
-		flat.Description,
-		flat.Metro,
-		flat.Link,
-		flat.PriceInUsd,
-		flat.PriceInByn,
-	)
 
 	users, err := b.userRepository.FindAll()
 	if err != nil {
@@ -72,10 +55,29 @@ func (b *TelegramBot) NotifyAboutNewFlat(flat model.Flat) {
 		return
 	}
 
-	for _, user := range users {
-		_, err := b.bot.Send(telebot.ChatID(user.ChatID), message, telebot.ModeHTML)
-		if err != nil {
-			log.Printf("Error while sending message to user: %v", err)
+	for _, flat := range flats {
+		if flat.Metro == "" {
+			flat.Metro = "Не указано"
+		}
+
+		message := fmt.Sprintf(
+			string(messagePattern),
+			flat.ID,
+			flat.Source,
+			flat.Parameters,
+			flat.Address,
+			flat.Description,
+			flat.Metro,
+			flat.Link,
+			flat.PriceInUsd,
+			flat.PriceInByn,
+		)
+
+		for _, user := range users {
+			_, err := b.bot.Send(telebot.ChatID(user.ChatID), message, telebot.ModeHTML)
+			if err != nil {
+				log.Printf("Error while sending message to user: %v", err)
+			}
 		}
 	}
 

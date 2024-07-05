@@ -43,7 +43,7 @@ func (p KufarFlatParser) Parse() ([]model.Flat, error) {
 			ID:          id,
 			Parameters:  params.Summary,
 			Rooms:       params.Rooms,
-			Area:        params.Area,
+			AreaInSqM:   params.Area,
 			Floor:       params.Floor,
 			TotalFloors: params.TotalFloors,
 			Address:     extractAddress(item),

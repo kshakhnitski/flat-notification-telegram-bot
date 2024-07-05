@@ -44,9 +44,7 @@ func main() {
 		}
 
 		log.Printf("New flats found: %d. Notifying users.", len(newFlats))
-		for _, flat := range newFlats {
-			telegramBot.NotifyAboutNewFlat(flat)
-		}
+		telegramBot.NotifyAboutNewFlats(newFlats)
 	})
 
 	log.Println("Starting flat monitor...")
