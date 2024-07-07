@@ -5,7 +5,7 @@ import (
 	"flat_bot/internal/model"
 	"flat_bot/internal/repository"
 	"fmt"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"log"
 	"os"
 )
@@ -22,7 +22,7 @@ func NewStartHandler(userRepository repository.UserRepository) *StartHandler {
 	}
 }
 
-func (h *StartHandler) Handle(c telebot.Context) error {
+func (h *StartHandler) Handle(c tele.Context) error {
 	sender := c.Sender()
 	user := model.User{
 		ID:        sender.ID,
@@ -50,5 +50,5 @@ func (h *StartHandler) Handle(c telebot.Context) error {
 		return errors.New(fmt.Sprintf("Error while reading hello message template: %v", err))
 	}
 
-	return c.Send(fmt.Sprintf(string(messagePattern), user.FirstName), telebot.ModeHTML)
+	return c.Send(fmt.Sprintf(string(messagePattern), user.FirstName), tele.ModeHTML)
 }

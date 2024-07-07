@@ -6,24 +6,24 @@ import (
 	"flat_bot/internal/repository"
 	"flat_bot/pkg/config"
 	"fmt"
-	"gopkg.in/telebot.v3"
+	tele "gopkg.in/telebot.v3"
 	"log"
 	"os"
 	"time"
 )
 
 type TelegramBot struct {
-	bot            *telebot.Bot
+	bot            *tele.Bot
 	userRepository repository.UserRepository
 }
 
 func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.UserRepository) *TelegramBot {
-	pref := telebot.Settings{
+	pref := tele.Settings{
 		Token:  config.Token,
-		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
 
-	bot, err := telebot.NewBot(pref)
+	bot, err := tele.NewBot(pref)
 	if err != nil {
 		log.Fatalf("Error while creating bot: %v", err)
 	}
@@ -33,7 +33,7 @@ func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.
 	return &TelegramBot{bot: bot, userRepository: userRepository}
 }
 
-func initializeHandlers(bot *telebot.Bot, userRepository repository.UserRepository) {
+func initializeHandlers(bot *tele.Bot, userRepository repository.UserRepository) {
 	startHandler := handler.NewStartHandler(userRepository)
 	bot.Handle(startHandler.Endpoint, startHandler.Handle)
 }
@@ -75,7 +75,7 @@ func (b *TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
 		)
 
 		for _, user := range users {
-			_, err := b.bot.Send(telebot.ChatID(user.ChatID), message, telebot.ModeHTML)
+			_, err := b.bot.Send(tele.ChatID(user.ChatID), message, tele.ModeHTML)
 			if err != nil {
 				log.Printf("Error while sending message to user: %v", err)
 			}
