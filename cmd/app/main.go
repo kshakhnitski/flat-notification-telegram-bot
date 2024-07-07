@@ -31,7 +31,10 @@ func main() {
 	flatRepository := repository.NewFlatRepository(dbConnection)
 	userRepository := repository.NewUserRepository(dbConnection)
 
-	telegramBot := bot.NewTelegramBot(&appConfig.TelegramBotConfig, userRepository)
+	telegramBot, err := bot.NewTelegramBot(&appConfig.TelegramBotConfig, userRepository)
+	if err != nil {
+		log.Fatalf("Error while creating telegram bot: %v", err)
+	}
 
 	log.Println("Starting bot...")
 	go telegramBot.Start()

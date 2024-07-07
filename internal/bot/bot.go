@@ -17,7 +17,7 @@ type TelegramBot struct {
 	userRepository repository.UserRepository
 }
 
-func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.UserRepository) *TelegramBot {
+func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.UserRepository) (*TelegramBot, error) {
 	pref := tele.Settings{
 		Token:  config.Token,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
@@ -25,24 +25,25 @@ func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.
 
 	bot, err := tele.NewBot(pref)
 	if err != nil {
-		log.Fatalf("Error while creating bot: %v", err)
+		return nil, err
 	}
 
-	initializeHandlers(bot, userRepository)
+	b := &TelegramBot{bot: bot, userRepository: userRepository}
+	b.initHandlers()
 
-	return &TelegramBot{bot: bot, userRepository: userRepository}
+	return b, nil
 }
 
-func initializeHandlers(bot *tele.Bot, userRepository repository.UserRepository) {
-	startHandler := handler.NewStartHandler(userRepository)
-	bot.Handle(startHandler.Endpoint, startHandler.Handle)
+func (b TelegramBot) initHandlers() {
+	startHandler := handler.NewStartHandler(b.userRepository)
+	b.bot.Handle(startHandler.Endpoint, startHandler.Handle)
 }
 
-func (b *TelegramBot) Start() {
+func (b TelegramBot) Start() {
 	b.bot.Start()
 }
 
-func (b *TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
+func (b TelegramBot) NotifyAboutNewFlats(flats []model.Flat) {
 	messagePattern, err := os.ReadFile("templates/new_flat_available.html")
 	if err != nil {
 		log.Printf("Error while reading message template: %v", err)
