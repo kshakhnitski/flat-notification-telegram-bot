@@ -17,7 +17,7 @@ type TelegramBot struct {
 	userRepository repository.UserRepository
 }
 
-func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.UserRepository) (*TelegramBot, error) {
+func NewTelegramBot(config config.TelegramBotConfig, userRepository repository.UserRepository) (TelegramBot, error) {
 	pref := tele.Settings{
 		Token:  config.Token,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
@@ -25,13 +25,13 @@ func NewTelegramBot(config *config.TelegramBotConfig, userRepository repository.
 
 	bot, err := tele.NewBot(pref)
 	if err != nil {
-		return nil, err
+		return TelegramBot{}, err
 	}
 
-	b := &TelegramBot{bot: bot, userRepository: userRepository}
-	b.initHandlers()
+	flatBot := TelegramBot{bot: bot, userRepository: userRepository}
+	flatBot.initHandlers()
 
-	return b, nil
+	return flatBot, nil
 }
 
 func (b TelegramBot) initHandlers() {

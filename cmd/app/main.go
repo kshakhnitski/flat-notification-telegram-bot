@@ -12,42 +12,42 @@ import (
 )
 
 func main() {
-	appConfig := config.LoadConfig()
+	cfg := config.LoadConfig()
 
 	log.Println("Connecting to database...")
-	dbConnection, err := db.ConnectDatabase(appConfig.DatabaseConfig)
+	conn, err := db.ConnectDatabase(cfg.DatabaseConfig)
 	if err != nil {
 		log.Fatalf("Error while connecting to database: %v", err)
 	}
 	log.Println("Connected to database")
 
 	log.Println("Auto-migrating database schema...")
-	err = dbConnection.AutoMigrate(&model.Flat{}, &model.User{})
+	err = conn.AutoMigrate(&model.Flat{}, &model.User{})
 	if err != nil {
 		log.Fatalf("Failed to auto-migrate database schema: %v", err)
 	}
 	log.Println("Database schema migrated")
 
-	flatRepository := repository.NewFlatRepository(dbConnection)
-	userRepository := repository.NewUserRepository(dbConnection)
+	flatRepo := repository.NewFlatRepository(conn)
+	userRepo := repository.NewUserRepository(conn)
 
-	telegramBot, err := bot.NewTelegramBot(&appConfig.TelegramBotConfig, userRepository)
+	flatBot, err := bot.NewTelegramBot(cfg.TelegramBotConfig, userRepo)
 	if err != nil {
 		log.Fatalf("Error while creating telegram bot: %v", err)
 	}
 
 	log.Println("Starting bot...")
-	go telegramBot.Start()
+	go flatBot.Start()
 	log.Println("Bot started")
 
-	flatMonitor := monitor.NewFlatMonitor(30*time.Second, flatRepository, func(newFlats []model.Flat) {
+	flatMonitor := monitor.NewFlatMonitor(30*time.Second, flatRepo, func(newFlats []model.Flat) {
 		if len(newFlats) == 0 {
 			log.Println("No new flats found")
 			return
 		}
 
 		log.Printf("New flats found: %d. Notifying users.", len(newFlats))
-		telegramBot.NotifyAboutNewFlats(newFlats)
+		flatBot.NotifyAboutNewFlats(newFlats)
 	})
 
 	log.Println("Starting flat monitor...")

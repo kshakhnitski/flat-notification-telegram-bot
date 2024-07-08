@@ -15,14 +15,14 @@ type StartHandler struct {
 	userRepository repository.UserRepository
 }
 
-func NewStartHandler(userRepository repository.UserRepository) *StartHandler {
-	return &StartHandler{
+func NewStartHandler(userRepository repository.UserRepository) StartHandler {
+	return StartHandler{
 		Endpoint:       "/start",
 		userRepository: userRepository,
 	}
 }
 
-func (h *StartHandler) Handle(c tele.Context) error {
+func (h StartHandler) Handle(c tele.Context) error {
 	sender := c.Sender()
 	user := model.User{
 		ID:        sender.ID,
