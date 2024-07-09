@@ -11,21 +11,21 @@ import (
 type FlatsHandler func(flats []model.Flat)
 
 type FlatMonitor struct {
-	sources          []string
-	checkInterval    time.Duration
-	newFlatsConsumer FlatsHandler
-	flatRepository   repository.FlatRepository
+	sources         []string
+	checkInterval   time.Duration
+	newFlatsHandler FlatsHandler
+	flatRepository  repository.FlatRepository
 }
 
 func NewFlatMonitor(
 	checkInterval time.Duration,
 	flatRepository repository.FlatRepository,
-	newFlatsConsumer FlatsHandler,
+	newFlatsHandler FlatsHandler,
 ) FlatMonitor {
 	return FlatMonitor{
-		checkInterval:    checkInterval,
-		flatRepository:   flatRepository,
-		newFlatsConsumer: newFlatsConsumer,
+		checkInterval:   checkInterval,
+		flatRepository:  flatRepository,
+		newFlatsHandler: newFlatsHandler,
 	}
 }
 
@@ -37,7 +37,7 @@ func (l FlatMonitor) Start() {
 		log.Println("Checking for new flats...")
 		newFlats := l.checkForNewFlats()
 
-		l.newFlatsConsumer(newFlats)
+		l.newFlatsHandler(newFlats)
 	}
 }
 
